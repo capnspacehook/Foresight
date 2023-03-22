@@ -67,22 +67,27 @@ Configuration::Configuration(const std::string& xml)
 	}
 
 	// Input
-
 	juce::XmlElement* inputTreeRootElement = rootElement->getChildByName("input");
 
 	if (inputTreeRootElement == nullptr) throw std::runtime_error("No <input> node found.");
 
 	inputTreeRoot = std::make_unique<InputTreeRootNode>(*inputTreeRootElement);
+	std::unordered_set<std::string> inputTags;
+	inputTreeRoot->getTags(inputTags);
 
 	// Output
-
 	juce::XmlElement* outputListRootElement = rootElement->getChildByName("output");
 
 	if (outputListRootElement == nullptr) throw std::runtime_error("No <output> node found.");
 
+	std::unordered_set<std::string> outputTags;
 	int maxOutputStartDelay = 0;
 	for (const auto& tagElement : outputListRootElement->getChildIterator()) {
 		const std::string tagName = tagElement->getStringAttribute("name").toStdString();
+		if (!inputTags.contains(tagName)) {
+			throw std::runtime_error("<output> tag " + tagName + " does not match any <input> tags");
+		}
+		outputTags.emplace(tagName);
 
 		for (const auto& setElement : tagElement->getChildIterator()) {
 			auto outputNode = OutputListNode(*setElement);
@@ -91,6 +96,12 @@ Configuration::Configuration(const std::string& xml)
 			}
 
 			outputList[tagName].emplace_back(outputNode);
+		}
+	}
+
+	for (const auto& inputTag : inputTags) {
+		if (!outputTags.contains(inputTag)) {
+			throw std::runtime_error("<input> tag " + inputTag + " does not match any <output> tags");
 		}
 	}
 

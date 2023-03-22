@@ -113,3 +113,12 @@ int InputTreeSwitchNode::getTargetValue(NoteContext& context)
             throw std::runtime_error("Invalid <input> target value");
     }
 }
+
+void InputTreeSwitchNode::getTags(std::unordered_set<std::string>& tags)
+{
+    for (const auto& cases : children) {
+        for (const auto& caseChild : std::get<1>(cases)) {
+            caseChild->getTags(tags);
+        }
+    }
+}

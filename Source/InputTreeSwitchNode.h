@@ -8,6 +8,7 @@ class InputTreeSwitchNode : public IInputTreeNode {
 public:
 	explicit InputTreeSwitchNode(const juce::XmlElement& source);
 	NoteContext& visit(NoteContext& context) override;
+	void getTags(std::unordered_set<std::string>& tags) override;
 private:
 	enum TargetType { CC, VELOCITY, LEGATO, LENGTH, NOTE, KEYSWITCH, PROGRAM };
 

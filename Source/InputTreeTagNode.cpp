@@ -10,3 +10,8 @@ NoteContext& InputTreeTagNode::visit(NoteContext& context)
 	context.addTag(tag);
 	return context;
 }
+
+void InputTreeTagNode::getTags(std::unordered_set<std::string>& tags)
+{
+	tags.emplace(tag);
+}

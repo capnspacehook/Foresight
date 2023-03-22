@@ -17,3 +17,10 @@ NoteContext& InputTreeRootNode::visit(NoteContext& context)
 
     return context;
 }
+
+void InputTreeRootNode::getTags(std::unordered_set<std::string>& tags)
+{
+    for (const auto& child : children) {
+        child->getTags(tags);
+    }
+}
