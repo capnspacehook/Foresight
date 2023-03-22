@@ -6,6 +6,9 @@ on:
       - "*"
     tags:
       - "v*"
+  pull_request:
+    branches:
+      - "*"
   workflow_dispatch:
 
 # When pushing new commits, cancel any running builds on that branch
@@ -107,36 +110,33 @@ jobs:
           7z x pluginval_${{ matrix.name }}.zip
           ${{ matrix.pluginval-binary }} --strictness-level 10 --verbose --validate "${{ env.VST3_PATH }}"
 
-      - name: Zip VST3, AU and AUv3 (MacOS)
-        if: runner.os == 'macOS'
-        run: |
-          cmake -E tar cvf ${{ env.PRODUCT_NAME }}.zip --format=zip "${{ env.ARTIFACTS_PATH }}"
-
       - name: Upload VST3 (Windows)
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.PRODUCT_NAME }}.vst3
+          name: ${{ env.PRODUCT_NAME }}_{{ runner.os }}
           path: "${{ env.VST3_PATH }}/**/*.vst3"
 
       - name: Upload zipped VST3, AU and AUv3 (MacOS)
         if: runner.os == 'macOS'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.PRODUCT_NAME }}.zip
-          path: ${{ env.PRODUCT_NAME }}.zip
+          name: ${{ env.PRODUCT_NAME }}_{{ runner.os }}
+          path: ${{ env.ARTIFACTS_PATH }}/
 
       - name: Upload SO (Linux)
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.PRODUCT_NAME }}.so
+          name: ${{ env.PRODUCT_NAME }}_{{ runner.os }}
           path: "${{ env.VST3_PATH }}/**/*.so"
 
   release:
     if: contains(github.ref, 'tags/v')
     runs-on: ubuntu-latest
     needs: build_and_test
+    permissions:
+      contents: write
 
     steps:
       - name: Get Artifacts
@@ -145,10 +145,8 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
-          prerelease: true
           # download-artifact puts these files in their own dirs...
           # Using globs sidesteps having to pass the version around
           files: |
-            */*.vst3
             */*.zip
-            */*.so
+          generate_release_notes: true
