@@ -114,21 +114,23 @@ jobs:
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.PRODUCT_NAME }}_{{ runner.os }}
+          name: ${{ env.PRODUCT_NAME }}
           path: "${{ env.VST3_PATH }}/**/*.vst3"
 
-      - name: Upload zipped VST3, AU and AUv3 (MacOS)
+      - name: Upload VST3, AU and AUv3 (MacOS)
         if: runner.os == 'macOS'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.PRODUCT_NAME }}_{{ runner.os }}
-          path: ${{ env.ARTIFACTS_PATH }}/
+          name: ${{ env.PRODUCT_NAME }}
+          path: |
+            ${{ env.ARTIFACTS_PATH }}/AU/
+            ${{ env.ARTIFACTS_PATH }}/VST3/
 
       - name: Upload SO (Linux)
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.PRODUCT_NAME }}_{{ runner.os }}
+          name: ${{ env.PRODUCT_NAME }}
           path: "${{ env.VST3_PATH }}/**/*.so"
 
   release:
