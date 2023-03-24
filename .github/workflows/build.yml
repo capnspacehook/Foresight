@@ -144,11 +144,16 @@ jobs:
       - name: Get Artifacts
         uses: actions/download-artifact@v3
 
+      - name: Show files
+        run: |
+          pwd
+          ls -la
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           # download-artifact puts these files in their own dirs...
           # Using globs sidesteps having to pass the version around
           files: |
-            ${{ env.PROJECT_NAME }}/*
+            ${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}/*
           generate_release_notes: true
