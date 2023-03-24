@@ -110,6 +110,11 @@ jobs:
           7z x pluginval_${{ matrix.name }}.zip
           ${{ matrix.pluginval-binary }} --strictness-level 10 --verbose --validate "${{ env.VST3_PATH }}"
 
+      - name: Zip VST3, AU and AUv3 (MacOS)
+        if: runner.os == 'macOS'
+        run: |
+          cmake -E tar cvf ${{ env.PRODUCT_NAME }}.zip --format=zip "${{ env.ARTIFACTS_PATH }}/AU" "${{ env.ARTIFACTS_PATH }}/VST3"
+
       - name: Upload VST3 (Windows)
         if: runner.os == 'Windows'
         uses: actions/upload-artifact@v3
@@ -123,8 +128,7 @@ jobs:
         with:
           name: ${{ env.PRODUCT_NAME }}
           path: |
-            ${{ env.ARTIFACTS_PATH }}/AU/
-            ${{ env.ARTIFACTS_PATH }}/VST3/
+            ${{ env.PRODUCT_NAME }}.zip
 
       - name: Upload SO (Linux)
         if: runner.os == 'Linux'
@@ -147,7 +151,7 @@ jobs:
       - name: Show files
         run: |
           pwd
-          ls -la
+          ls -la -R
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -155,5 +159,7 @@ jobs:
           # download-artifact puts these files in their own dirs...
           # Using globs sidesteps having to pass the version around
           files: |
-            ${{ env.PROJECT_NAME }}/${{ env.PROJECT_NAME }}/*
+            **/*.vst3
+            **/*.zip
+            **/*.so
           generate_release_notes: true
